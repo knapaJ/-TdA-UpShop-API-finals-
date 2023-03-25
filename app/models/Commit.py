@@ -7,7 +7,6 @@ import datetime
 class Commit(db.Model):
     """
     Commit dataclass, has:
-    - ID
     - Creator
     - Time
     - Lines added
