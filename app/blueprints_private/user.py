@@ -2,27 +2,11 @@ from app import db
 from flask import Blueprint, abort, jsonify, request, session
 from sqlalchemy.exc import IntegrityError
 from app.models.User import User
+from app.blueprints.errorhandling import abort_bad_json
+import app.blueprints.errorhandling as json_error_handler
 
 private_user_endpoint = Blueprint("private_user_endpoint", __name__)
-
-
-def abort_bad_json():
-    abort(400, description="Missing fields in JSON data")
-
-
-@private_user_endpoint.errorhandler(400)
-def bad_request(e):
-    return jsonify(message=f"{e.description}"), 400
-
-
-@private_user_endpoint.errorhandler(404)
-def not_found(e):
-    return jsonify(message=f"{e.description}"), 404
-
-
-@private_user_endpoint.errorhandler(403)
-def forbidden(e):
-    return jsonify(message=f"{e.description}"), 403
+json_error_handler.add_error_handlers(private_user_endpoint)
 
 
 @private_user_endpoint.route("/create", methods=["PUT"])

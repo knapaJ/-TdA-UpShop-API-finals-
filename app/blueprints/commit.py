@@ -5,29 +5,13 @@ from app.models.User import User
 from app.models.Commit import Commit
 from datetime import datetime
 from dateutil import parser as dateparser
+import app.blueprints.errorhandling as json_error_handler
+from app.blueprints.errorhandling import abort_bad_json
 
 TOO_MUCH = 40
 
 commit_endpoint = Blueprint("commit_endpoint", __name__)
-
-
-def abort_bad_json():
-    abort(400, description="Missing fields in JSON data")
-
-
-@commit_endpoint.errorhandler(400)
-def bad_request(e):
-    return jsonify(message=f"{e.description}"), 400
-
-
-@commit_endpoint.errorhandler(404)
-def not_found(e):
-    return jsonify(message=f"{e.description}"), 404
-
-
-@commit_endpoint.errorhandler(403)
-def forbidden(e):
-    return jsonify(message=f"{e.description}"), 403
+json_error_handler.add_error_handlers(commit_endpoint)
 
 
 @commit_endpoint.route("", methods=["GET"])

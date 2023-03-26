@@ -5,27 +5,11 @@ from app.models.User import User
 from app.models.Commit import Commit
 from datetime import datetime
 from dateutil import parser as dateparser
+from app.blueprints.errorhandling import abort_bad_json
+import app.blueprints.errorhandling as json_error_handler
 
 private_commit_endpoint = Blueprint("private_commit_endpoint", __name__)
-
-
-def abort_bad_json():
-    abort(400, description="Missing fields in JSON data")
-
-
-@private_commit_endpoint.errorhandler(400)
-def bad_request(e):
-    return jsonify(message=f"{e.description}"), 400
-
-
-@private_commit_endpoint.errorhandler(404)
-def not_found(e):
-    return jsonify(message=f"{e.description}"), 404
-
-
-@private_commit_endpoint.errorhandler(403)
-def forbidden(e):
-    return jsonify(message=f"{e.description}"), 403
+json_error_handler.add_error_handlers(private_commit_endpoint)
 
 
 @private_commit_endpoint.route("/create", methods=["PUT"])
