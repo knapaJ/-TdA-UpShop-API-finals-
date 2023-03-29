@@ -1,11 +1,13 @@
 from flask_restx import Api
 from .User import apiUserNs
+from .Commit import apiCommitNs
+from sqlalchemy.exc import IntegrityError
 
 auth = {
     'apikey': {
         'type': 'apiKey',
         'in': 'header',
-        'name': 'x-contractor-id',
+        'name': 'x-access-token',
     },
 }
 
@@ -18,4 +20,11 @@ api = Api(
     authorizations=auth,
 )
 
+
+@api.errorhandler(IntegrityError)
+def conflict(error):
+    return {"message": "Edited or created resource is in direct conflict with current server state."}, 409
+
+
 api.add_namespace(apiUserNs, path="/user")
+api.add_namespace(apiCommitNs, path='/commit')

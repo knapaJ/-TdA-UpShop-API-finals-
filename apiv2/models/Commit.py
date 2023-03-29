@@ -12,7 +12,7 @@ class Commit(db.Model):
     - Lines added
     - Lines removed
     - uuid
-    - comment (max 256 chars)
+    - comment
     """
     __tablename__ = "commits"
     _id = db.Column(db.Integer, primary_key=True, name='id')
@@ -20,6 +20,8 @@ class Commit(db.Model):
     uuid = db.Column(db.String(40), nullable=False, default=Utils.str_uuid4)
     description = db.Column(db.Text, nullable=True)
     date = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    lines_added = db.Column(db.Integer, nullable=False)
+    lines_removed = db.Column(db.Integer, nullable=False)
     # Relationships
     creator = db.relationship("User", backref=db.backref("commits", cascade="all,delete"), lazy="joined")
 
@@ -32,10 +34,14 @@ class Commit(db.Model):
 
     def __init__(self,
                  creator: User.User,
+                 lines_added: int,
+                 lines_removed: int,
                  description: str | None = None,
                  date: datetime.datetime | None = None):
         self.creator = creator
         self.description = description
+        self.lines_added = lines_added
+        self.lines_removed = lines_removed
         if date:
             self.date = date
 
