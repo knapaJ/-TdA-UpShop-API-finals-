@@ -8,6 +8,7 @@ flask = "*"
 flask-sqlalchemy = "*"
 sqlalchemy = "*"
 python-dateutil = "*"
+faker = "*"
 
 [dev-packages]
 

@@ -3,6 +3,8 @@ from app import db
 from . import Utils
 import datetime
 
+import faker
+from app.models.User import User
 
 class Commit(db.Model):
     """
@@ -41,3 +43,17 @@ class Commit(db.Model):
 
     def __repr__(self):
         return f"[COMMIT] {self.creator.nick}: {self.description}"
+    
+    def generate_fake_data(records=200):
+        fake = faker.Faker()
+        users = User.query.all()
+
+        if not users:
+            print("No users found, skipping commit generation")
+            return
+
+        for i in range(records):
+            commit = Commit(creator=fake.random.choice(users), description=fake.text(max_nb_chars=20))
+            db.session.add(commit)
+
+        db.session.commit()

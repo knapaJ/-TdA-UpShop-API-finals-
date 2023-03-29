@@ -1,0 +1,11 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "TdA-UpShop-API",
+            "database": "${workspaceFolder:-TdA-UpShop-API-finals-}/instance/app.db"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
+}

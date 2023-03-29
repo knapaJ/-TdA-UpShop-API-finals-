@@ -1,5 +1,4 @@
 import os
-import datetime
 
 import flask
 from flask import Flask
@@ -55,7 +54,9 @@ def create_app(test_config=None):
 
     @app.cli.command()
     def seeddata():
-        print("Seeding testing data values ...", end='')
+        print("Seeding testing data values ...")
+        User.User.generate_fake_data()
+        Commit.Commit.generate_fake_data()
         print("DONE")
 
     @app.cli.command()

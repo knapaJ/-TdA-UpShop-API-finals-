@@ -1,6 +1,7 @@
+import faker
+import sqlalchemy
 from app import db
 from . import Utils
-
 
 class User(db.Model):
     """
@@ -36,4 +37,29 @@ class User(db.Model):
         super(User, self).__init__(**kwargs)
 
     def __repr__(self):
-        return f"[USER] {self.name} {self.nick} {self.surname}"
+        return f"[USER] {self.nick} {self.name} {self.surname}"
+
+    @staticmethod
+    def generate_fake_data(records=20, tries=None):
+        tries = tries or records/2
+        fake = faker.Faker()
+        
+        while records > 0:
+            name: str = fake.first_name()
+            surname: str = fake.last_name()
+            nick = f"{name[:1]}{surname.lower()}"
+
+            user = User(nick=nick, name=name, surname=surname)
+            db.session.add(user)
+
+            try:
+                db.session.commit()
+            except sqlalchemy.exc.IntegrityError:
+                db.session.rollback()
+                tries -= 1
+                if tries == 0:
+                    print("Skipping user generation due to too many collisions!")
+                    break
+                continue
+
+            records -= 1
