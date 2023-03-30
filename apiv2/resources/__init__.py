@@ -1,6 +1,7 @@
 from flask_restx import Api
 from .User import apiUserNs
 from .Commit import apiCommitNs
+from .Sysinfo import apiSysinfoNamespace
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 auth = {
@@ -33,3 +34,4 @@ def db_error(error):
 
 api.add_namespace(apiUserNs, path="/user")
 api.add_namespace(apiCommitNs, path='/commit')
+api.add_namespace(apiSysinfoNamespace, path='/sysinfo')

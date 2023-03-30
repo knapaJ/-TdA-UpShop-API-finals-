@@ -67,7 +67,8 @@ class CommitResource(Resource):
     @apiCommitNs.expect(commit_schema, validate=True)
     @sec_admin
     def put(self):
-        creator = db.session.query(User).filter_by(uuid=apiCommitNs.payload["creator_id"]).first_or_404()
+        creator = db.session.query(User).filter_by(uuid=apiCommitNs.payload["creator_id"])\
+            .first_or_404(description="Creator user has not been found")
         date = parse_datetime(apiCommitNs.payload.get('date'))
         new_commit = Commit(creator=creator,
                             description=apiCommitNs.payload["description"],
