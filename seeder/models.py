@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from seeder.message_gen import gen
 import faker
 import random
 
@@ -45,12 +46,12 @@ class Commit:
             date=fake.date_time_between(start_date="-1y", end_date="now").isoformat() if init else None,
             lines_added=random.randint(0, 100),
             lines_removed=random.randint(0, 100),
-            description=fake.text(max_nb_chars=300)
+            description=gen.__next__()  # fake.text(max_nb_chars=300)
         )
 
     def dump(self):
         ret = {}
         for (key, value) in self.__dict__.items():
-            if value:
+            if value is not None:
                 ret[key] = value
         return ret
