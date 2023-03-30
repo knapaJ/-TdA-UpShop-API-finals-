@@ -12,6 +12,8 @@ flask-restful = "*"
 flask-apispec = "*"
 marshmallow = "*"
 flask-restx = "*"
+requests = "*"
+faker = "*"
 
 [dev-packages]
 
