@@ -7,13 +7,13 @@ COMMIT_URL = f'{API_URL}/commit'
 HEADER = {'x-access-token': 'dev'}
 
 # Set the number of users/commits to create at the start
-START_USERS = 10
-START_COMMITS = 10
+START_USERS = 20
+START_COMMITS = 300
 
 # Set proportions of user/commit creation in the loop
-USER_PROPORTION = 0.1
+USER_PROPORTION = 0.05
 
 # Retry delay in seconds
-REQUEST_DELAY = 2
-CONNECTION_DELAY = 5
-TIMEOUT_DELAY = 5
+REQUEST_DELAY = 5
+CONNECTION_DELAY = 10
+TIMEOUT_DELAY = 10
