@@ -3,7 +3,7 @@ import datetime
 import flask
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_restx import Api
+from flask_cors import CORS
 # SQLite ForeignKey constraints enforcement enable, as per: https://stackoverflow.com/a/15542046
 # from sqlalchemy import event
 # from sqlalchemy.engine import Engine
@@ -75,5 +75,7 @@ def create_app(test_config=None):
 
     from apiv2.resources import api
     api.init_app(app)
+
+    CORS(app)
 
     return app

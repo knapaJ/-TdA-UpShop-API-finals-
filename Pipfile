@@ -15,6 +15,7 @@ flask-restx = "*"
 requests = "*"
 faker = "*"
 psutil = "*"
+flask-cors = "*"
 
 [dev-packages]
 
