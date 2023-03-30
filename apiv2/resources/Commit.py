@@ -85,11 +85,11 @@ class CommitResource(Resource):
 @apiCommitNs.response(403, "You do not have access to this resource. The authorization you provided is not sufficient.")
 @apiCommitNs.response(401, "Authorization required. You did not provide any valid authentication.")
 @apiCommitNs.doc(security=['apikey'])
-@sec_contractor
 @apiCommitNs.route('/filter/<string:datetime_from>/<string:datetime_to>', endpoint='commit from to')
 @apiCommitNs.route('/filter/<string:datetime_from>', endpoint='commit from')
 class FilteredCommitResource(Resource):
     @apiCommitNs.marshal_with(commit_schema, as_list=True, description='List of all commits in the given time period')
+    @sec_contractor
     def get(self, datetime_from: str, datetime_to: str | None = None):
         datetime_from = parse_datetime(datetime_from)
         datetime_to = parse_datetime(datetime_to)
@@ -97,3 +97,14 @@ class FilteredCommitResource(Resource):
         step = step.filter(Commit.date <= datetime_to) if datetime_to else step
         return step.order_by('date').all(), 200
 
+
+@apiCommitNs.response(403, "You do not have access to this resource. The authorization you provided is not sufficient.")
+@apiCommitNs.response(401, "Authorization required. You did not provide any valid authentication.")
+@apiCommitNs.doc(security=['apikey'])
+@apiCommitNs.param('number', "Number of commits to return", _in='path')
+@apiCommitNs.route('/latest/<int:number>', endpoint='commit latest')
+class LatestCommitResource(Resource):
+    @apiCommitNs.marshal_with(commit_schema, as_list=True, description='List of last *number* commits')
+    @sec_contractor
+    def get(self, number: int):
+        return db.session.query(Commit).order_by(Commit.date.desc()).limit(number).all()
