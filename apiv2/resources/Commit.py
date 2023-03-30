@@ -5,6 +5,7 @@ from .security import sec_admin, sec_contractor
 from apiv2 import db
 from apiv2.models.User import User
 from apiv2.models.Commit import Commit
+from .datetimeparser import parse_datetime
 
 apiCommitNs = Namespace('Commit', description="Commit resource endpoints.")
 
@@ -17,7 +18,7 @@ commit_schema = apiCommitNs.model(name='Commit', model={
     'date': fields.DateTime(required=False,
                             dt_format="iso8601",
                             default=datetime.datetime.utcnow,
-                            description='Creation time in ISO8601 format, UTC'),
+                            description='Creation time in ISO8601 format, with UTC timestamp'),
     'lines_added': fields.Integer(required=True,
                                   description='Lines added in this commit'),
     'lines_removed': fields.Integer(required=True,
@@ -31,6 +32,8 @@ commit_schema = apiCommitNs.model(name='Commit', model={
 })
 
 
+@apiCommitNs.response(409, "Conflict with data on the server. You most likely tried to use a value, that is already"
+                           "taken, in a field with the 'unique' constraint.")
 @apiCommitNs.response(403, "You do not have access to this resource. The authorization you provided is not sufficient.")
 @apiCommitNs.response(401, "Authorization required. You did not provide any valid authentication.")
 @apiCommitNs.response(404, "Commit not found")
@@ -45,6 +48,8 @@ class ExistingCommitResource(Resource):
         return db.session.query(Commit).filter_by(uuid=commit_id).first_or_404()
 
 
+@apiCommitNs.response(409, "Conflict with data on the server. You most likely tried to use a value, that is already"
+                           "taken, in a field with the 'unique' constraint.")
 @apiCommitNs.response(403, "You do not have access to this resource. The authorization you provided is not sufficient.")
 @apiCommitNs.response(401, "Authorization required. You did not provide any valid authentication.")
 @apiCommitNs.doc(security=['apikey'])
@@ -62,16 +67,14 @@ class CommitResource(Resource):
     @apiCommitNs.expect(commit_schema, validate=True)
     @sec_admin
     def put(self):
-        try:
-            creator = db.session.query(User).filter_by(uuid=apiCommitNs.payload["creator_id"]).first_or_404()
-            date = datetime.datetime.fromisoformat(apiCommitNs.payload['date']) if 'date' in apiCommitNs.payload else None
-            new_commit = Commit(creator=creator,
-                                description=apiCommitNs.payload["description"],
-                                lines_added=apiCommitNs.payload['lines_added'],
-                                lines_removed=apiCommitNs.payload['lines_removed'],
-                                date=date)
-            db.session.add(new_commit)
-            db.session.commit()
-            return new_commit, 201
-        except ValueError as error:
-            abort(400, message=f"Error parsing 'date' field:{error}")
+        creator = db.session.query(User).filter_by(uuid=apiCommitNs.payload["creator_id"]).first_or_404()
+        date = parse_datetime(apiCommitNs.payload.get('date'))
+        new_commit = Commit(creator=creator,
+                            description=apiCommitNs.payload["description"],
+                            lines_added=apiCommitNs.payload['lines_added'],
+                            lines_removed=apiCommitNs.payload['lines_removed'],
+                            date=date)
+        db.session.add(new_commit)
+        db.session.commit()
+        return new_commit, 201
+

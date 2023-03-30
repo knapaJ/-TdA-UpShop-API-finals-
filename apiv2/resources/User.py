@@ -29,6 +29,8 @@ user_schema = apiUserNs.model(name='User', model={
 })
 
 
+@apiUserNs.response(409, "Conflict with data on the server. You most likely tried to use a value, that is already"
+                         "taken, in a field with the 'unique' constraint.")
 @apiUserNs.response(403, "You do not have access to this resource. The authorization you provided is not sufficient.")
 @apiUserNs.response(401, "Authorization required. You did not provide any valid authentication.")
 @apiUserNs.param("user_id", "ID of the desired user", _in="path")
@@ -62,6 +64,8 @@ class ExistingUserResource(Resource):
         return user, 201
 
 
+@apiUserNs.response(409, "Conflict with data on the server. You most likely tried to use a value, that is already"
+                         "taken, in a field with the 'unique' constraint.")
 @apiUserNs.response(403, "You do not have access to this resource. The authorization you provided is not sufficient.")
 @apiUserNs.response(401, "Authorization required. You did not provide any valid authentication.")
 @apiUserNs.doc(security=['apikey'])
@@ -85,4 +89,3 @@ class UserResource(Resource):
     def get(self):
         users = db.session.query(User).all()
         return users, 200
-
