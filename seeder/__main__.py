@@ -1,40 +1,41 @@
-from config import *
-from utils import *
+from seeder.handlers import *
+from seeder.utils import *
+import seeder.models as models
 import time
 import requests
 import random
 
+
 def main():
+    models.init = True
     print("Sending user data...")
     for _ in range(START_USERS):
         response: requests.Response = r_user_factory()
-        check_error(response)
+        response.raise_for_status()
 
     print("Sending commit data...")
     for _ in range(START_COMMITS):
-        user_id = get_random_user_id()
-        response: requests.Response = r_commit_factory(creator_id=user_id)
-        check_error(response)
-        
+        response: requests.Response = r_commit_factory()
+        response.raise_for_status()
+
+    models.init = False
     print("Sending data in a loop...")
     # Send the data in a loop
 
     while True:
-        # Get user ID
-        user_id = get_random_user_id()
-
-        if user_id is None:
-            response: requests.Response = r_user_factory()
-            print("No users in database, user created")
+        if random.random() > USER_PROPORTION:
+            print("Creating commit...", end=" ")
+            response: requests.Response = r_commit_factory()
+            response.raise_for_status()
+            print("DONE")
         else:
-            if random.random() > USER_PROPORTION:
-                response: requests.Response = r_commit_factory(creator_id=user_id)
-                print("Commit created")
-            else:
-                response: requests.Response = r_user_factory()
-                print("User created")
-        check_error(response)   
+            print("Creating user...", end=" ")
+            response: requests.Response = r_user_factory()
+            response.raise_for_status()
+            print("DONE")
+
         time.sleep(REQUEST_DELAY)
+
 
 if __name__ == "__main__":
     while True:
@@ -46,9 +47,14 @@ if __name__ == "__main__":
         except requests.Timeout:
             print("Timeout")
             time.sleep(TIMEOUT_DELAY)
-        except requests.HTTPError:
-            print("HTTP error")
-            break
+        except requests.HTTPError as e:
+            response_code = e.response.status_code
+            handler = {
+                400: handle_400,
+                404: handle_404,
+                500: handle_500
+            }
+            handler[response_code](e)
         except requests.TooManyRedirects:
             print("Too many redirects")
             break
