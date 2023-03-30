@@ -1,0 +1,10 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "local",
+            "database": "${workspaceFolder:-TdA-UpShop-API-finals-}/instance/app.db  "
+        }
+    ]
+}

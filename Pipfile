@@ -8,6 +8,12 @@ flask = "*"
 flask-sqlalchemy = "*"
 sqlalchemy = "*"
 python-dateutil = "*"
+flask-restful = "*"
+flask-apispec = "*"
+marshmallow = "*"
+flask-restx = "*"
+requests = "*"
+faker = "*"
 
 [dev-packages]
 
