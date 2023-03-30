@@ -2,7 +2,8 @@ from dataclasses import dataclass
 import faker
 import random
 
-fake = faker.Faker()
+fake = faker.Faker(['cs_CZ'])
+
 
 @dataclass(init=True, repr=True)
 class User:
@@ -18,6 +19,17 @@ class User:
             surname=fake.last_name()
         )
 
+    def dump(self):
+        ret = {}
+        for (key, value) in self.__dict__.items():
+            if value:
+                ret[key] = value
+        return ret
+
+
+init = True
+
+
 @dataclass(init=True, repr=True)
 class Commit:
     creator_id: str
@@ -30,8 +42,15 @@ class Commit:
     def fake(creator_id):
         return Commit(
             creator_id=creator_id,
-            date=fake.date_time_between(start_date="-1y", end_date="now").isoformat(),
+            date=fake.date_time_between(start_date="-1y", end_date="now").isoformat() if init else None,
             lines_added=random.randint(0, 100),
             lines_removed=random.randint(0, 100),
-            description=fake.text(max_nb_chars=20)
+            description=fake.text(max_nb_chars=300)
         )
+
+    def dump(self):
+        ret = {}
+        for (key, value) in self.__dict__.items():
+            if value:
+                ret[key] = value
+        return ret

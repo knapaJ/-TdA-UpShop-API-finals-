@@ -1,20 +1,27 @@
-from models import User, Commit
-from config import *
+from seeder.models import User, Commit
+from seeder.config import *
 import requests
 import random
 
-def check_error(response: requests.Response):
-    if not response.ok:
-        print(f"Error: {response.status_code} {response.reason}")
-        raise Exception(response.reason)
+user_list = []
 
-def get_random_user_id()->str|None:
+
+def sync_users():
     response: requests.Response = requests.get(USER_URL, headers=HEADER)
-    check_error(response)
-    users = response.json()
-    if not users:
-        return None
-    return random.choice(users)['userID']
+    response.raise_for_status()
+    # extract the userIDs from the response
+    return [user['userID'] for user in response.json()]
 
-r_user_factory = lambda: requests.put(USER_URL, json=User.fake().__dict__, headers=HEADER)
-r_commit_factory = lambda creator_id: requests.put(COMMIT_URL, json=Commit.fake(creator_id).__dict__, headers=HEADER)
+
+def r_user_factory() -> requests.Response:
+    ret = requests.put(USER_URL, json=User.fake().dump(), headers=HEADER)
+    if ret.ok:
+        user_list.append(ret.json()['userID'])
+    return ret
+
+
+def r_commit_factory() -> requests.Response:
+    if not user_list:
+        return r_user_factory()
+    creator_id = random.choice(user_list)
+    return requests.put(COMMIT_URL, json=Commit.fake(creator_id).dump(), headers=HEADER)
