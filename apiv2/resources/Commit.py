@@ -45,7 +45,7 @@ class ExistingCommitResource(Resource):
     @apiCommitNs.doc(description="Get Commit by tis UUID")
     @sec_contractor
     def get(self, commit_id):
-        return db.session.query(Commit).filter_by(uuid=commit_id).first_or_404()
+        return db.session.query(Commit).filter_by(uuid=commit_id).order_by('date').first_or_404()
 
 
 @apiCommitNs.response(409, "Conflict with data on the server. You most likely tried to use a value, that is already"
@@ -77,4 +77,22 @@ class CommitResource(Resource):
         db.session.add(new_commit)
         db.session.commit()
         return new_commit, 201
+
+
+@apiCommitNs.response(409, "Conflict with data on the server. You most likely tried to use a value, that is already"
+                           "taken, in a field with the 'unique' constraint.")
+@apiCommitNs.response(403, "You do not have access to this resource. The authorization you provided is not sufficient.")
+@apiCommitNs.response(401, "Authorization required. You did not provide any valid authentication.")
+@apiCommitNs.doc(security=['apikey'])
+@sec_contractor
+@apiCommitNs.route('/filter/<string:datetime_from>/<string:datetime_to>', endpoint='commit from to')
+@apiCommitNs.route('/filter/<string:datetime_from>', endpoint='commit from')
+class FilteredCommitResource(Resource):
+    @apiCommitNs.marshal_with(commit_schema, as_list=True, description='List of all commits in the given time period')
+    def get(self, datetime_from: str, datetime_to: str | None = None):
+        datetime_from = parse_datetime(datetime_from)
+        datetime_to = parse_datetime(datetime_to)
+        step = db.session.query(Commit).filter(Commit.date >= datetime_from)
+        step = step.filter(Commit.date <= datetime_to) if datetime_to else step
+        return step.order_by('date').all(), 200
 

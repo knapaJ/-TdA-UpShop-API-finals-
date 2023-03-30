@@ -14,6 +14,7 @@ commit_endpoint = Blueprint("commit_endpoint", __name__)
 json_error_handler.add_error_handlers(commit_endpoint)
 
 
+
 @commit_endpoint.route("", methods=["GET"])
 def get_commits():
     ret = []
