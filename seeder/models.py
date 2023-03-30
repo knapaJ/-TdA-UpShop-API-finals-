@@ -9,15 +9,13 @@ class User:
     name: str
     surname: str
     nick: str
-    avatar_url: str
 
     @staticmethod
     def fake():
         return User(
             nick=fake.user_name(),
             name=fake.first_name(),
-            surname=fake.last_name(),
-            avatar_url=f"https://picsum.photos/seed/{fake.uuid4()}/200/200"
+            surname=fake.last_name()
         )
 
 @dataclass(init=True, repr=True)
