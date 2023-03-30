@@ -1,40 +1,17 @@
-from models import User, Commit
+from config import *
+from utils import *
 import time
 import requests
 import random
 
-def check_error(response: requests.Response):
-    if not response.ok:
-        print(f"Error: {response.status_code} {response.reason}")
-        raise Exception(response.reason)
-
-def get_random_user_id()->str|None:
-    response: requests.Response = requests.get(USER_URL, headers=HEADER)
-    check_error(response)
-    users = response.json()
-    if not users:
-        return None
-    return random.choice(users)['userID']
-
-# Set the API endpoint URL and the data to send
-API_URL = 'http://127.0.0.1:5000'
-USER_URL = f'{API_URL}/user'
-COMMIT_URL = f'{API_URL}/commit'
-
-# Set the API key as a header
-HEADER = {'x-access-token': 'dev'}
-
-r_user_factory = lambda: requests.put(USER_URL, json=User.fake().__dict__, headers=HEADER)
-r_commit_factory = lambda creator_id: requests.put(COMMIT_URL, json=Commit.fake(creator_id).__dict__, headers=HEADER)
-
 def main():
     print("Sending user data...")
-    for _ in range(10):
+    for _ in range(START_USERS):
         response: requests.Response = r_user_factory()
         check_error(response)
 
     print("Sending commit data...")
-    for _ in range(10):
+    for _ in range(START_COMMITS):
         user_id = get_random_user_id()
         response: requests.Response = r_commit_factory(creator_id=user_id)
         check_error(response)
@@ -50,14 +27,14 @@ def main():
             response: requests.Response = r_user_factory()
             print("No users in database, user created")
         else:
-            if random.random() > 0.1:
+            if random.random() > USER_PROPORTION:
                 response: requests.Response = r_commit_factory(creator_id=user_id)
                 print("Commit created")
             else:
                 response: requests.Response = r_user_factory()
                 print("User created")
         check_error(response)   
-        time.sleep(2)
+        time.sleep(REQUEST_DELAY)
 
 if __name__ == "__main__":
     while True:
@@ -65,10 +42,10 @@ if __name__ == "__main__":
             main()
         except requests.ConnectionError:
             print("Connection error")
-            time.sleep(5)
+            time.sleep(CONNECTION_DELAY)
         except requests.Timeout:
             print("Timeout")
-            time.sleep(5)
+            time.sleep(TIMEOUT_DELAY)
         except requests.HTTPError:
             print("HTTP error")
             break
