@@ -1,7 +1,7 @@
 import os
 import datetime
 import flask
-from flask import Flask
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 # SQLite ForeignKey constraints enforcement enable, as per: https://stackoverflow.com/a/15542046
@@ -72,6 +72,13 @@ def create_app(test_config=None):
         return f"Hello world!<br/> Application root is: {app.config['APPLICATION_ROOT']}<br/> URL for this page is: " \
                f"{flask.url_for('hello_world', _external=True)}<br/>" \
                f"<img src=\"https://picsum.photos/seed/paisdpaishdpai/200\"/>", 200
+
+    @app.before_request
+    def print_blame():
+
+        team = app.config['K_CONTRACTOR_TOKEN_LIST'].get(request.headers.get('x-access-token')) or \
+               request.headers.get('x-access-token') or 'UNKNOWN'
+        print(f"#{team}# requested {request.path}")
 
     from apiv2.resources import api
     api.init_app(app)
