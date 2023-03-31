@@ -2,3 +2,4 @@
 /instance
 Pipfile.lock
 *.pyc
+*.secret
