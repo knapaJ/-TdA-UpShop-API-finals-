@@ -59,7 +59,7 @@ class CommitResource(Resource):
     @apiCommitNs.doc(description="Get all Commits")
     @sec_contractor
     def get(self):
-        return db.session.query(Commit).all()
+        return db.session.query(Commit).order_by(Commit.date).all()
 
     @apiCommitNs.marshal_with(commit_schema, description="Created commit", code=201)
     @apiCommitNs.doc(description="Create commit")
