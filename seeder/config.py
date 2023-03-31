@@ -1,5 +1,5 @@
 # Set the API endpoint URL and the data to send
-API_URL = 'http://127.0.0.1:5000'
+API_URL = 'https://upshop.knapa.cz'
 USER_URL = f'{API_URL}/user'
 COMMIT_URL = f'{API_URL}/commit'
 
@@ -14,7 +14,7 @@ START_COMMITS = 600
 USER_PROPORTION = 0.05
 
 # Retry delay in seconds
-REQUEST_MIN_DELAY = 60
-REQUEST_MAX_DELAY = 60 * 10
+REQUEST_MIN_DELAY = 30
+REQUEST_MAX_DELAY = 60 * 2
 CONNECTION_DELAY = 10
 TIMEOUT_DELAY = 10
