@@ -34,7 +34,9 @@ def main():
             response.raise_for_status()
             print("DONE")
 
-        time.sleep(REQUEST_DELAY)
+        dif = REQUEST_MAX_DELAY - REQUEST_MIN_DELAY
+        delay = random.random() * dif + REQUEST_MIN_DELAY
+        time.sleep(delay)
 
 
 if __name__ == "__main__":

@@ -1,13 +1,24 @@
 from dataclasses import dataclass
 from seeder.message_gen import gen
+from abc import ABC
 import faker
 import random
 
 fake = faker.Faker(['cs_CZ'])
 
 
+class DumpAble(ABC):
+    def dump(self):
+        ret = {}
+        for (key, value) in self.__dict__.items():
+            # skip None value when dumping data
+            if value is not None:
+                ret[key] = value
+        return ret
+
+
 @dataclass(init=True, repr=True)
-class User:
+class User(DumpAble):
     name: str
     surname: str
     nick: str
@@ -20,19 +31,12 @@ class User:
             surname=fake.last_name()
         )
 
-    def dump(self):
-        ret = {}
-        for (key, value) in self.__dict__.items():
-            if value:
-                ret[key] = value
-        return ret
-
 
 init = True
 
 
 @dataclass(init=True, repr=True)
-class Commit:
+class Commit(DumpAble):
     creator_id: str
     date: str | None = None
     lines_added: int = 0
@@ -48,10 +52,3 @@ class Commit:
             lines_removed=random.randint(0, 100),
             description=gen.__next__()  # fake.text(max_nb_chars=300)
         )
-
-    def dump(self):
-        ret = {}
-        for (key, value) in self.__dict__.items():
-            if value is not None:
-                ret[key] = value
-        return ret
