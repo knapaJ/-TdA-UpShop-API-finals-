@@ -7,21 +7,25 @@ import random
 
 
 def main():
-    models.init = True
-    print("Sending user data...")
-    for _ in range(START_USERS):
-        response: requests.Response = r_user_factory()
-        response.raise_for_status()
+    utils.user_list = sync_users()
+    if len(utils.user_list) > 0:
+        models.init = False
 
-    print("Sending commit data...")
-    for _ in range(START_COMMITS):
-        response: requests.Response = r_commit_factory()
-        response.raise_for_status()
+    if models.init:
+        print("Sending user data...")
+        for _ in range(START_USERS):
+            response: requests.Response = r_user_factory()
+            response.raise_for_status()
 
-    models.init = False
-    print("Sending data in a loop...")
+        print("Sending commit data...")
+        for _ in range(START_COMMITS):
+            response: requests.Response = r_commit_factory()
+            response.raise_for_status()
+
+        models.init = False
+        print("Sending data in a loop...")
+
     # Send the data in a loop
-
     while True:
         if random.random() > USER_PROPORTION:
             print("Creating commit...", end=" ")
@@ -53,6 +57,7 @@ if __name__ == "__main__":
             response_code = e.response.status_code
             handler = {
                 400: handle_400,
+                403: handle_403,
                 404: handle_404,
                 500: handle_500
             }

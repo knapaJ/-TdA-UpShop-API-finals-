@@ -21,7 +21,7 @@ def r_user_factory() -> requests.Response:
 
 
 def r_commit_factory() -> requests.Response:
-    if not user_list:
+    if not len(user_list) > 0:
         return r_user_factory()
     creator_id = random.choice(user_list)
     return requests.put(COMMIT_URL, json=Commit.fake(creator_id).dump(), headers=HEADER)
