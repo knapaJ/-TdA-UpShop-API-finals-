@@ -33,7 +33,7 @@ def get_level_from_token(token: str) -> AccessLevel:
 
     contractor_tokens: list = current_app.config.get("K_CONTRACTOR_TOKEN_LIST")
     if not contractor_tokens:
-        contractor_tokens = ["dev-user"]
+        contractor_tokens = {"dev-user": "DEVELOPMENT-USER"}
     if token in contractor_tokens:
         return AccessLevel.CONTRACTOR
     abort(403)

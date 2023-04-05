@@ -75,7 +75,6 @@ def create_app(test_config=None):
 
     @app.before_request
     def print_blame():
-
         team = app.config['K_CONTRACTOR_TOKEN_LIST'].get(request.headers.get('x-access-token')) or \
                request.headers.get('x-access-token') or 'UNKNOWN'
         print(f"#{team}# requested {request.path}")
